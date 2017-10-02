@@ -10,21 +10,21 @@
 // ######## Serial Varibles ########
 #pragma region Serial Varibels
 	// for Packet_Setup_RF_RX_module():
-		char RX_Braudrate = 0x04;		// Default: 4 = 9600
+		char RX_Braudrate = 0x08;		// Default: 8 = 115200
 		char RX_CH = 0x01;				// Default:	1 = C001
-		char RX_RF_Power = 0x08;		// Default: 8 = 20DB
+		char RX_RF_Power = 0x08;		// Default: 8 = 20dBm
 		char RX_RF_Mode = 0x03;			// Default: 3 = FU3
 		char RX_Sleep = 0x00;			// Default: 0 = False
 
 	// for Packet_RF_RX_Ready();
-		char RX_Ready = 0x00;			// Default: 0 = False
+		char RX_Ready = 0x00;			// Default: 0 = False (don't check)
 
 	// for Packet_RF_RX_Telemetry():
-		char T_HC_12 = 0x00;			// Default: 0 = False
-		char T_S0 = 0x00;				// Default: 0 = False
-		char T_S1 = 0x00;				// Default: 0 = False
-		char T_S2 = 0x00;				// Default: 0 = False
-		char T_S3 = 0x00;				// Default: 0 = False
+		char T_HC_12 = 0x00;			// Default: 0 = False (don't check)
+		char T_S0 = 0x00;				// Default: 0 = False (don't check)
+		char T_S1 = 0x00;				// Default: 0 = False (don't check)
+		char T_S2 = 0x00;				// Default: 0 = False (don't check)
+		char T_S3 = 0x00;				// Default: 0 = False (don't check)
 
 	// for Packet_RF_RX_Gyro():
 		char G1_X_MSB = 0x00;			// Default: 0
@@ -62,40 +62,69 @@
 
 // ######## Serial Setup ########
 #pragma region Serial Setup
-	// Serial Setup:
-	void SerialSetup(int SerialNr,int x) { // nr = serial number, x = braudrate
-		switch (SerialNr)
+
+	// Get Braudrate:
+	int GetBraudrate(int x) {
+		// Switch braudrate
+		switch (x) // Switch between Braudrates
 		{
-		case 0: // if serial 0 is selected this is also the USB
-			Serial.begin(x);
-			while (!Serial) {
-				;
-			}
+		case 0: // if Braudrate 0 (1200) is selected
+			return 1200;
 			break;
-		case 1:	// if serial 1 is selected
-			Serial1.begin(x);
-			while (!Serial1) {
-				;
-			}
+		case 1: // if Braudrate 1 (2400) is selected
+			return 2400;
 			break;
-		case 2: // if serial 2 is selected
-			Serial2.begin(x);
-			while (!Serial2) {
-				;
-			}
+		case 2: // if Braudrate 2 (4800) is selected
+			return 4800;
 			break;
-		case 3: // if serial 3 is selected
-			Serial3.begin(x);
-			while (!Serial3) {
-				;
-			}
+		case 3: // if Braudrate 3 (9600) is selected
+			return 9600;
+			break;
+		case 4: // if Braudrate 4 (19200) is selected
+			return 19200;
+			break;
+		case 5: // if Braudrate 5 (38400) is selected
+			return 38400;
+			break;
+		case 6: // if Braudrate 6 (57600) is selected
+			return 57600;
+			break;
+		case 7: // if Braudrate 7 (115600) is selected
+			return 115600;
 			break;
 		default:
 			break;
 		}
 	}
 
-	// A Debug Serial Port is always on Serial 0 as that is the USB
+	// Serial Setup:
+	void SerialSetup(int SerialNr,int x) { // nr = serial number, x = braudrate
+
+		// Open selected serial port with said braudrate
+		switch (SerialNr) // Switch between serial ports
+		{
+		case 0: // if serial 0 is selected this is also the USB
+			Serial.begin(GetBraudrate(x));
+			while (!Serial) {}
+			break;
+		case 1:	// if serial 1 is selected
+			Serial1.begin(GetBraudrate(x));
+			while (!Serial1) {}
+			break;
+		case 2: // if serial 2 is selected
+			Serial2.begin(GetBraudrate(x));
+			while (!Serial2) {}
+			break;
+		case 3: // if serial 3 is selected
+			Serial3.begin(GetBraudrate(x));
+			while (!Serial3) {}
+			break;
+		default:
+			break;
+		}
+	}
+
+	// A Debug Serial Port is always on Serial 0 as that is the USB, if debug = true
 	void DebugSerial() {
 		if (debug == true) {
 			Serial.begin(115200);
@@ -158,7 +187,7 @@
 	}
 
 	// Send buttons 0-15
-	void Packet_RF_RX_DivSwitche() {
+	void Packet_RF_RX_DivButton() {
 		char setup[9] = { 0x04, BNT_0_7, BNT_8_15, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 		SendPacket(setup, sizeof setup, RFSerial);
 	}
@@ -170,7 +199,7 @@
 	// Send a Packet over serial:
 	void SendPacket(const char *Array, size_t Size, int SerialNr) {
 	
-	int tmp[16]; // <--- look at this later, virker kun hvis stører end "Size"
+	int tmp[16]; // <--- look at this later, only works if bigger than "Size" (default = 16)
 
 	// convert char array to uint8_t array
 	for (int i = 0; i < Size; i++)
