@@ -9,6 +9,8 @@
 
 // ######## Serial Varibles ########
 #pragma region Serial Varibels
+// Setup the default values for the system
+
 	// for Packet_Setup_RF_RX_module():
 		char RX_Braudrate = 0x08;		// Default: 8 = 115200
 		char RX_CH = 0x01;				// Default:	1 = C001
@@ -45,18 +47,18 @@
 		char S2_6_7 = 0x00;				// Default: 00
 
 	// for Packet_RF_RX_Pot():
-		char POT_0_MSB = 0x00;				// Default: 0
-		char POT_0_LSB = 0x00;				// Default: 0
-		char POT_1_MSB = 0x00;				// Default: 0
-		char POT_1_LSB = 0x00;				// Default: 0
-		char POT_2_MSB = 0x00;				// Default: 0
-		char POT_2_LSB = 0x00;				// Default: 0
-		char POT_3_MSB = 0x00;				// Default: 0
-		char POT_3_LSB = 0x00;				// Default: 0
+		char POT_0_MSB = 0x00;			// Default: 0
+		char POT_0_LSB = 0x00;			// Default: 0
+		char POT_1_MSB = 0x00;			// Default: 0
+		char POT_1_LSB = 0x00;			// Default: 0
+		char POT_2_MSB = 0x00;			// Default: 0
+		char POT_2_LSB = 0x00;			// Default: 0
+		char POT_3_MSB = 0x00;			// Default: 0
+		char POT_3_LSB = 0x00;			// Default: 0
 
 	// for Packet_RF_RX_DivSwitche():
-		char BNT_0_7 = 0x00;				// Default: 0
-		char BNT_8_15 = 0x00;				// Default: 0
+		char BNT_0_7 = 0x00;			// Default: 0
+		char BNT_8_15 = 0x00;			// Default: 0
 
 #pragma endregion
 
@@ -150,46 +152,39 @@
 	// A basic packet is 9 byte's long 8 data byte's and 1 ID byte
 	// Fx: ID , D0 , D1 , D2 , D3 , D4 , D5 , D6 , D7
 
-	// Setup RF Connection
-	void Packet_Setup_RF_RX_module(){
+	void RF_Setup_packet() { // Setup RF Connection
 		char setup[9] = { 0xFF, RX_Braudrate, RX_CH, RX_RF_Power, RX_RF_Mode, RX_Sleep, 0x00, 0x00, 0x00 };
 		SendPacket(setup, sizeof setup, RFSerial);
 	}
 
-	// Ask RX if it's ready:
-	void Packet_RF_RX_Ready() {
-		char setup[9] = { 0xFE, RX_Ready, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-		SendPacket(setup, sizeof setup, RFSerial);
+	void RX_Ready_packet() {	// Ask RX if it's ready:
+		char setup1[9] = { 0xFE, RX_Ready, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+		SendPacket(setup1, sizeof setup1, RFSerial);
 	}
 
-	// Ask for Telemetry data from RX:
-	void Packet_RF_RX_Telemetry() {
-		char setup[9] = { 0xFD, T_HC_12, T_S0, T_S1, T_S2, T_S3, 0x00, 0x00, 0x00 };
-		SendPacket(setup, sizeof setup, RFSerial);
+	void Telemetry_packet() { // Ask for Telemetry data from RX:
+		char setup2[9] = { 0xFD, T_HC_12, T_S0, T_S1, T_S2, T_S3, 0x00, 0x00, 0x00 };
+		SendPacket(setup2, sizeof setup2, RFSerial);
 	}
 
-	// Send 2-Axis Gyro data
-	void Packet_RF_RX_Gyro() {
-		char setup[9] = { 0x01, G1_X_MSB, G1_X_LSB, G1_Y_MSB, G1_Y_LSB, G2_X_MSB, G2_X_LSB, G2_Y_MSB, G2_Y_LSB };
-		SendPacket(setup, sizeof setup, RFSerial);
+	void Gyro_packet() { // Send 2-Axis Gyro data
+		char setup3[9] = { 0x01, G1_X_MSB, G1_X_LSB, G1_Y_MSB, G1_Y_LSB, G2_X_MSB, G2_X_LSB, G2_Y_MSB, G2_Y_LSB };
+		SendPacket(setup3, sizeof setup3, RFSerial);
 	}
 
-	// Send 3-Way and 2-Way Switches
-	void Packet_RF_RX_DivSwitche() {
-		char setup[9] = { 0x02, S3_0_1, S3_2_3, 0x00, 0x00, S2_0_1, S2_2_3, S2_4_5, S2_6_7 };
-		SendPacket(setup, sizeof setup, RFSerial);
+	void Switch_packet() {	// Send 3-Way and 2-Way Switches
+		char setup4[9] = { 0x02, S3_0_1, S3_2_3, 0x00, 0x00, S2_0_1, S2_2_3, S2_4_5, S2_6_7 };
+		SendPacket(setup4, sizeof setup4, RFSerial);
 	}
 
-	// Send Pot 0-3
-	void Packet_RF_RX_Pot() {
-		char setup[9] = { 0x03, POT_0_MSB, POT_0_LSB, POT_1_MSB, POT_1_LSB, POT_2_MSB, POT_2_LSB, POT_3_MSB, POT_3_LSB };
-		SendPacket(setup, sizeof setup, RFSerial);
+	void Pot_packet() {	// Send Pot 0-3
+		char setup5[9] = { 0x03, POT_0_MSB, POT_0_LSB, POT_1_MSB, POT_1_LSB, POT_2_MSB, POT_2_LSB, POT_3_MSB, POT_3_LSB };
+		SendPacket(setup5, sizeof setup5, RFSerial);
 	}
 
-	// Send buttons 0-15
-	void Packet_RF_RX_DivButton() {
-		char setup[9] = { 0x04, BNT_0_7, BNT_8_15, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-		SendPacket(setup, sizeof setup, RFSerial);
+	void Button_packet() {	// Send buttons 0-15
+		char setup6[9] = { 0x04, BNT_0_7, BNT_8_15, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+		SendPacket(setup6, sizeof setup6, RFSerial);
 	}
 
 #pragma endregion

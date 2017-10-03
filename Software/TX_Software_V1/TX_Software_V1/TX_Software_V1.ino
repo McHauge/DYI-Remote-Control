@@ -17,7 +17,7 @@ const bool debug = true; // Enable debug
 
 // RF Serial Port default = 1 and braudrate = 7 (115200)
 int RFSerial = 1; // Select 0,1,2,3
-int RFBraud = 7;  // Select 0 (1200), 1 (2400), 2 (4800), 3 (9600), 4 (19200), 5 (38400), 6 (57600), 7 (115200)
+int RFBraud = 3;  // Select 0 (1200), 1 (2400), 2 (4800), 3 (9600), 4 (19200), 5 (38400), 6 (57600), 7 (115200)
 
 #pragma endregion
 
@@ -35,9 +35,9 @@ void loop() {
 
 	// Test setup:
 
-	char test[9] = { 0xFF, 0x02, 0xAB, 0xC9, 0x11, 0x15, 0xC8, 0x00, 0x30 };
+//	char test[9] = { 0xFF, 0x02, 0xAB, 0xC9, 0x11, 0x15, 0xC8, 0x00, 0x30 };
 
-	SendPacket( test, sizeof test, RFSerial);
+//	SendPacket( test, sizeof test, RFSerial);
 
 
 	delay(1000);
