@@ -17,6 +17,7 @@
   <ItemGroup>
     <None Include="TX_Software_V1.ino" />
     <None Include="TX_Serial_Functions.ino" />
+    <None Include="HC_12.ino" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="__vm\.TX_Software_V1.vsarduino.h">

@@ -11,6 +11,9 @@
 #pragma region Serial Varibels
 // Setup the default values for the system
 
+	// HC-12 PINS
+
+
 	// for Packet_Setup_RF_RX_module():
 		char RX_Braudrate = 0x08;		// Default: 8 = 115200
 		char RX_CH = 0x01;				// Default:	1 = C001
@@ -64,7 +67,7 @@
 
 // ######## Serial Setup ########
 #pragma region Serial Setup
-
+		
 	// Get Braudrate:
 	int GetBraudrate(int x) {
 		// Switch braudrate
@@ -140,6 +143,7 @@
 			Serial.println(" ");
 		}
 	}
+
 #pragma endregion
 
 #pragma endregion
@@ -234,5 +238,15 @@
 	}
 }
 #pragma endregion
+
+#pragma endregion
+
+
+	// ################ Other Functions ################
+#pragma region Other Functions
+	void DefaultPinSetup() {
+		pinMode(HC_Reset, OUTPUT);
+		digitalWrite(HC_Reset, HIGH);	// Set HC-12 in normal operation
+	}
 
 #pragma endregion
