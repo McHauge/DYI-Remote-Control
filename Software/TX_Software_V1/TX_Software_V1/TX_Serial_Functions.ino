@@ -156,40 +156,97 @@
 	// A basic packet is 9 byte's long 8 data byte's and 1 ID byte
 	// Fx: ID , D0 , D1 , D2 , D3 , D4 , D5 , D6 , D7
 
-	void RF_Setup_packet() { // Setup RF Connection
-		char setup[9] = { 0xFF, RX_Braudrate, RX_CH, RX_RF_Power, RX_RF_Mode, RX_Sleep, 0x00, 0x00, 0x00 };
-		SendPacket(setup, sizeof setup, RFSerial);
-	}
+	// Setup RF Connection
+		void RF_Setup_packet() { 
+			char setup[9] = { 0xFE, RX_Braudrate, RX_CH, RX_RF_Power, RX_RF_Mode, RX_Sleep, 0x00, 0x00, 0x00 };
+			SendPacket(setup, sizeof setup, RFSerial);
+		}
 
-	void RX_Ready_packet() {	// Ask RX if it's ready:
-		char setup1[9] = { 0xFE, RX_Ready, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-		SendPacket(setup1, sizeof setup1, RFSerial);
-	}
+	// Ask RX if it's ready:
+		void RX_Ready_packet() {	
+			char setup1[9] = { 0xFD, RX_Ready, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+			SendPacket(setup1, sizeof setup1, RFSerial);
+		}
 
-	void Telemetry_packet() { // Ask for Telemetry data from RX:
-		char setup2[9] = { 0xFD, T_HC_12, T_S0, T_S1, T_S2, T_S3, 0x00, 0x00, 0x00 };
-		SendPacket(setup2, sizeof setup2, RFSerial);
-	}
+	// Ask for Telemetry data from RX:
+		void Telemetry_packet() { 
+			char setup2[9] = { 0xFC, T_HC_12, T_S0, T_S1, T_S2, T_S3, 0x00, 0x00, 0x00 };
+			SendPacket(setup2, sizeof setup2, RFSerial);
+		}
 
-	void Gyro_packet() { // Send 2-Axis Gyro data
-		char setup3[9] = { 0x01, G1_X_MSB, G1_X_LSB, G1_Y_MSB, G1_Y_LSB, G2_X_MSB, G2_X_LSB, G2_Y_MSB, G2_Y_LSB };
-		SendPacket(setup3, sizeof setup3, RFSerial);
-	}
+	// Send 2-Axis Gyro data
+		void Gyro_packet() { 
+			char setup3[9] = { 0x01, G1_X_MSB, G1_X_LSB, G1_Y_MSB, G1_Y_LSB, G2_X_MSB, G2_X_LSB, G2_Y_MSB, G2_Y_LSB };
+			SendPacket(setup3, sizeof setup3, RFSerial);
+		}
 
-	void Switch_packet() {	// Send 3-Way and 2-Way Switches
-		char setup4[9] = { 0x02, S3_0_1, S3_2_3, 0x00, 0x00, S2_0_1, S2_2_3, S2_4_5, S2_6_7 };
-		SendPacket(setup4, sizeof setup4, RFSerial);
-	}
+	// Send Switch data
+		void Switch_packet() {	
+			char setup4[9] = { 0x02, S3_0_1, S3_2_3, 0x00, 0x00, S2_0_1, S2_2_3, S2_4_5, S2_6_7 };
+			SendPacket(setup4, sizeof setup4, RFSerial);
+		}
 
-	void Pot_packet() {	// Send Pot 0-3
-		char setup5[9] = { 0x03, POT_0_MSB, POT_0_LSB, POT_1_MSB, POT_1_LSB, POT_2_MSB, POT_2_LSB, POT_3_MSB, POT_3_LSB };
-		SendPacket(setup5, sizeof setup5, RFSerial);
-	}
+	// Send Pot 0-3
+		void Pot_packet() {	
+			char setup5[9] = { 0x03, POT_0_MSB, POT_0_LSB, POT_1_MSB, POT_1_LSB, POT_2_MSB, POT_2_LSB, POT_3_MSB, POT_3_LSB };
+			SendPacket(setup5, sizeof setup5, RFSerial);
+		}
 
-	void Button_packet() {	// Send buttons 0-15
-		char setup6[9] = { 0x04, BNT_0_7, BNT_8_15, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+	// Send buttons 0-15
+		void Button_packet() {	
+			char setup6[9] = { 0x04, BNT_0_7, BNT_8_15, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+			SendPacket(setup6, sizeof setup6, RFSerial);
+		}
+
+	// Debug packet
+	void Debug_packet() {
+		char setup6[9] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
 		SendPacket(setup6, sizeof setup6, RFSerial);
 	}
+
+#pragma endregion
+
+// ######## Recived Packet Execution ########
+#pragma region Recived Packet Execution
+
+// Detects what packet type was recived
+int Recived_Packet() {
+	switch (msg[0])
+	{
+	case 0xFF:	
+		if (debug == true) { Serial.println("Debug packet recived"); }
+		return 1;
+		break;
+	case 0xEE:	
+		if (debug == true) { Serial.println("RF_Setup_Telemetry packet recived"); }
+		return 2;
+		break;
+	case 0xED:	
+		if (debug == true) { Serial.println("RX_Ready_Telemetry packet recived"); }
+		return 3;
+		break;
+	case 0xEC:	
+		if (debug == true) { Serial.println("Telemetry_S0 packet recived"); }
+		return 4;
+		break;
+	case 0xEB:	
+		if (debug == true) { Serial.println("Telemetry_S1 packet recived"); }
+		return 5;
+		break;
+	case 0xEA:	
+		if (debug == true) { Serial.println("Telemetry_S2 packet recived"); }
+		return 6;
+		break;
+	case 0xE9:	
+		if (debug == true) { Serial.println("Telemetry_S3 packet recived"); }
+		return 7;
+		break;
+	default:	
+		if (debug == true) { Serial.println("ERROR Can't detect message type"); }
+		return 0;
+		break;
+	}
+}
 
 #pragma endregion
 
@@ -227,16 +284,33 @@
 
 		// To the debug Console
 		if (debug == true) {
-			Serial.print(tmp[i], HEX);
-			Serial.print(" ");
+			Serial.print(tmp[i], HEX);				// Prints tmp to debug serial
+			if (i % 2 == 0) { Serial.print(" "); }	// Prints " " as a spacer after even bytes
+			if (i == 8) { Serial.println(""); }		// Moves onto next line 
 		}
 	}
-
-	// Jump to next line on Debug Console
-	if (debug == true) {
-		Serial.println(" ");
-	}
 }
+#pragma endregion
+
+// ######## Recive over Serial ########
+#pragma region Recive over Serial
+
+// Read data recived on Serial1 prints to Debug serial
+void SerialRead() {
+	for (int i = 0; i <9; i++) {					// Loops as long as a byte is recived
+		while (!Serial1.available());				// wait for a character
+		int incomingByte = Serial1.read();			// Reads recived byte into incommingByte
+		msg[i] = incomingByte;						// Stores the byte in msg[]
+		if (debug == true)
+		{
+			Serial.print(incomingByte, HEX);	 	// Prints to debug serial if debug = true
+			if (i % 2 == 0) { Serial.print(' '); }	// Prints " " as a spacer after even bytes
+		}
+	}
+	if (debug == true) { Serial.println(); }		// Moves onto next line
+	Serial1.flush();
+}
+
 #pragma endregion
 
 #pragma endregion
@@ -244,9 +318,6 @@
 
 	// ################ Other Functions ################
 #pragma region Other Functions
-	void DefaultPinSetup() {
-		pinMode(HC_Reset, OUTPUT);
-		digitalWrite(HC_Reset, HIGH);	// Set HC-12 in normal operation
-	}
+
 
 #pragma endregion

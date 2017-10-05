@@ -21,45 +21,6 @@ char RX_Sleep = 0x00;			// Default: 0 = False
 								// for Packet_RF_RX_Ready();
 char RX_Ready = 0x00;			// Default: 0 = False (don't check)
 
-								// for Packet_RF_RX_Telemetry():
-char T_HC_12 = 0x00;			// Default: 0 = False (don't check)
-char T_S0 = 0x00;				// Default: 0 = False (don't check)
-char T_S1 = 0x00;				// Default: 0 = False (don't check)
-char T_S2 = 0x00;				// Default: 0 = False (don't check)
-char T_S3 = 0x00;				// Default: 0 = False (don't check)
-
-								// for Packet_RF_RX_Gyro():
-char G1_X_MSB = 0x00;			// Default: 0
-char G1_X_LSB = 0x00;			// Default: 0
-char G1_Y_MSB = 0x00;			// Default: 0
-char G1_Y_LSB = 0x00;			// Default: 0
-char G2_X_MSB = 0x00;			// Default: 0
-char G2_X_LSB = 0x00;			// Default: 0
-char G2_Y_MSB = 0x00;			// Default: 0
-char G2_Y_LSB = 0x00;			// Default: 0
-
-								// for Packet_RF_RX_DivSwitche():
-char S3_0_1 = 0x00;				// Default: 00
-char S3_2_3 = 0x00;				// Default: 00
-char S2_0_1 = 0x00;				// Default: 00
-char S2_2_3 = 0x00;				// Default: 00
-char S2_4_5 = 0x00;				// Default: 00
-char S2_6_7 = 0x00;				// Default: 00
-
-								// for Packet_RF_RX_Pot():
-char POT_0_MSB = 0x00;			// Default: 0
-char POT_0_LSB = 0x00;			// Default: 0
-char POT_1_MSB = 0x00;			// Default: 0
-char POT_1_LSB = 0x00;			// Default: 0
-char POT_2_MSB = 0x00;			// Default: 0
-char POT_2_LSB = 0x00;			// Default: 0
-char POT_3_MSB = 0x00;			// Default: 0
-char POT_3_LSB = 0x00;			// Default: 0
-
-								// for Packet_RF_RX_DivSwitche():
-char BNT_0_7 = 0x00;			// Default: 0
-char BNT_8_15 = 0x00;			// Default: 0
-
 #pragma endregion
 
 // ######## Serial Setup ########
@@ -152,52 +113,101 @@ void DebugSerial() {
 // A basic packet is 9 byte's long 8 data byte's and 1 ID byte
 // Fx: ID , D0 , D1 , D2 , D3 , D4 , D5 , D6 , D7
 
-// Setup RF Connection
-void Packet_Setup_RF_RX_module() {
-	char setup[9] = { 0xFF, RX_Braudrate, RX_CH, RX_RF_Power, RX_RF_Mode, RX_Sleep, 0x00, 0x00, 0x00 };
+// Return RF configuration
+void RF_Setup_Telemetry_packet() {
+	char setup[9] = { 0xEE, RX_Braudrate, RX_CH, RX_RF_Power, RX_RF_Mode, RX_Sleep, 0x00, 0x00, 0x00 };
 	SendPacket(setup, sizeof setup, RFSerial);
 }
 
-// Ask RX if it's ready:
-void Packet_RF_RX_Ready() {
-	char setup[9] = { 0xFE, RX_Ready, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-	SendPacket(setup, sizeof setup, RFSerial);
+// Am my RX ready?
+void RX_Ready_Telemetry_packet() {
+	char setup1[9] = { 0xED, RX_Ready, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+	SendPacket(setup1, sizeof setup1, RFSerial);
 }
 
-// Ask for Telemetry data from RX:
-void Packet_RF_RX_Telemetry() {
-	char setup[9] = { 0xFD, T_HC_12, T_S0, T_S1, T_S2, T_S3, 0x00, 0x00, 0x00 };
-	SendPacket(setup, sizeof setup, RFSerial);
+// Return Telemetry S0 data from RX:
+void Telemetry_packet_S0() {
+	char setup2[9] = { 0xEC, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+	SendPacket(setup2, sizeof setup2, RFSerial);
 }
 
-// Send 2-Axis Gyro data
-void Packet_RF_RX_Gyro() {
-	char setup[9] = { 0x01, G1_X_MSB, G1_X_LSB, G1_Y_MSB, G1_Y_LSB, G2_X_MSB, G2_X_LSB, G2_Y_MSB, G2_Y_LSB };
-	SendPacket(setup, sizeof setup, RFSerial);
+// Return Telemetry S1 data from RX:
+void Telemetry_packet_S1() {
+	char setup3[9] = { 0xEB, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+	SendPacket(setup3, sizeof setup3, RFSerial);
 }
 
-// Send 3-Way and 2-Way Switches
-void Packet_RF_RX_DivSwitche() {
-	char setup[9] = { 0x02, S3_0_1, S3_2_3, 0x00, 0x00, S2_0_1, S2_2_3, S2_4_5, S2_6_7 };
-	SendPacket(setup, sizeof setup, RFSerial);
+// Return Telemetry S2 data from RX:
+void Telemetry_packet_S2() {
+	char setup4[9] = { 0xEA, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+	SendPacket(setup4, sizeof setup4, RFSerial);
 }
 
-// Send Pot 0-3
-void Packet_RF_RX_Pot() {
-	char setup[9] = { 0x03, POT_0_MSB, POT_0_LSB, POT_1_MSB, POT_1_LSB, POT_2_MSB, POT_2_LSB, POT_3_MSB, POT_3_LSB };
-	SendPacket(setup, sizeof setup, RFSerial);
+// Return Telemetry S3 data from RX:
+void Telemetry_packet_S3() {
+	char setup5[9] = { 0xE9, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+	SendPacket(setup5, sizeof setup5, RFSerial);
 }
 
-// Send buttons 0-15
-void Packet_RF_RX_DivButton() {
-	char setup[9] = { 0x04, BNT_0_7, BNT_8_15, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-	SendPacket(setup, sizeof setup, RFSerial);
+// Debug packet
+void Debug_packet() {
+	char setup6[9] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+	SendPacket(setup6, sizeof setup6, RFSerial);
+}
+
+#pragma endregion
+
+// ######## Recived Packet Execution ########
+#pragma region Recived Packet Execution
+
+// Detects what packet type was recived
+int Recived_Packet() {
+	switch (msg[0])
+	{
+	case 0xFF:	
+		if (debug == true) { Serial.println("Debug packet recived"); }
+		return 1;
+		break;
+	case 0xFE:	
+		if (debug == true) { Serial.println("RF_Connection packet recived"); }
+		return 2;
+		break;
+	case 0xFD:	
+		if (debug == true) { Serial.println("RX_Ready packet recived"); }
+		return 3;
+		break;
+	case 0xFC:	
+		if (debug == true) { Serial.println("Telemetry packet recived"); }
+		return 4;
+		break;
+	case 0x01:	
+		if (debug == true) { Serial.println("Gyro packet recived"); }
+		return 5;
+		break;
+	case 0x02:	
+		if (debug == true) { Serial.println("Switch packet recived"); }
+		return 6;
+		break;
+	case 0x03:	
+		if (debug == true) { Serial.println("Pot packet recived"); }
+		return 7;
+		break;
+	case 0x04:	
+		if (debug == true) { Serial.println("Buttons packet recived"); }
+		return 8;
+		break;
+	default:	
+		if (debug == true) { Serial.println("ERROR Can't detect message type"); }
+		return 0;
+		break;
+	}
 }
 
 #pragma endregion
 
 // ######## Transmit over Serial ########
 #pragma region Transmit over Serial
+
 // Send a Packet over serial:
 void SendPacket(const char *Array, size_t Size, int SerialNr) {
 
@@ -230,16 +240,37 @@ void SendPacket(const char *Array, size_t Size, int SerialNr) {
 
 		// To the debug Console
 		if (debug == true) {
-			Serial.print(tmp[i], HEX);
-			Serial.print(" ");
+			Serial.print(tmp[i], HEX);				// Prints tmp to debug serial
+			if (i % 2 == 0) { Serial.print(" "); }	// Prints " " as a spacer after even bytes
+			if (i == 8) { Serial.println(""); }		// Moves onto next line 
 		}
-	}
-
-	// Jump to next line on Debug Console
-	if (debug == true) {
-		Serial.println(" ");
 	}
 }
 #pragma endregion
+
+// ######## Recive over Serial ########
+#pragma region Recive over Serial
+
+// Read data recived on Serial1 prints to Debug serial
+void SerialRead() {
+	for (int i = 0; i <9; i++) {					// Loops as long as a byte is recived
+		while (!Serial1.available());				// wait for a character
+		int incomingByte = Serial1.read();			// Reads recived byte into incommingByte
+		msg[i] = incomingByte;						// Stores the byte in msg[]
+		if (debug == true)
+		{
+			Serial.print(incomingByte, HEX);	 	// Prints to debug serial if debug = true
+			if (i % 2 == 0) { Serial.print(' '); }	// Prints " " as a spacer after even bytes
+		}
+	}
+	if (debug == true) { Serial.println(); }		// Moves onto next line
+	Serial1.flush();
+}
+#pragma endregion
+
+#pragma endregion
+
+// ################ Other Functions ################
+#pragma region Other Functions
 
 #pragma endregion

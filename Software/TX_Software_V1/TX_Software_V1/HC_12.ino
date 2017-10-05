@@ -96,7 +96,7 @@ char HC_Setup(int power, int mode, int braud, int channel , int reset) {	// Brau
 		Serial1.write("AT+C001");
 		delay(50);
 	// Set up for 8bit data packet
-		Serial1.write("AT+U8O1"); //To set serial port format to be eight data bits, odd check, and one stop bit.
+		Serial1.write("AT+U8N1"); //To set serial port format to be 8 data bits, no check, and 1 stop bit.
 		delay(50);
 
 	// Inform user if debug = true
@@ -149,15 +149,21 @@ char HC_Current(int reset) {
 	digitalWrite(reset, HIGH);
 	
 }
-	// A function that allows serialpassthrough when needed
-		void Serialpassthrough() {
+
+// A function that allows serialpassthrough when needed
+void Serialpassthrough() {
 			if (Serial.available()) {      // If anything comes in Serial (USB),
-				Serial1.write(Serial.read());   // read it and send it out Serial1 (pins 0 & 1)
+				Serial1.print(Serial.read(), HEX);   // read it and send it out Serial1 (pins 0 & 1)
 			}
 
 			if (Serial1.available()) {     // If anything comes in Serial1 (pins 0 & 1)
-				Serial.write(Serial1.read());   // read it and send it out Serial (USB)
+				Serial.print(Serial1.read(), HEX);   // read it and send it out Serial (USB)
 			}
 		}
 
+// Set up HC-12 Reset pin
+void HC_DefaultPinSetup( int reset) {
+	pinMode(reset, OUTPUT);
+	digitalWrite(reset, HIGH);	// Set HC-12 in normal operation
+}
 
